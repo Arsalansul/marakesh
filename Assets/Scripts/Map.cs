@@ -22,10 +22,12 @@ namespace Assets.Scripts
             Camera.main.transform.position = new Vector3(size / 2f * Tile.size, 7, size / 2f * Tile.size);
         }
 
-        public void SetTileColor(Vector3 worldPos, Color color)
+        public void SetTilesColor(Vector3 worldPos, Color color)
         {
-            var tile = GetTileByPosition(worldPos);
-            tile.SetColor(color);
+            foreach (var tile in outlinedTiles)
+            {
+                tile.SetColor(color);
+            }
         }
 
         private Tile GetTileByPosition(Vector3 worldPos)
@@ -49,7 +51,7 @@ namespace Assets.Scripts
             return new Vector3(Tile.size * (tileIndex % size + 0.5f), 0, Tile.size * (tileIndex / size + 0.5f));
         }
 
-        public void SetTileOutLine(Vector3 worldPos, Color color, bool activate)
+        public void SetTilesOutLine(Vector3 worldPos, Color color, bool activate)
         {
             outlinedTiles.Clear();
             foreach (var selectedTile in GetSelectedTiles(worldPos, SelectionOrientaion.Horizontal))

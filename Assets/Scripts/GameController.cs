@@ -23,13 +23,14 @@ namespace Assets.Scripts
             var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out var hit))
             {
-                map.SetTileOutLine(hit.point, colors[current_player_id], true);
+                map.SetTilesOutLine(hit.point, colors[current_player_id], true);
 
 
                 if (Input.GetMouseButtonUp(0))
                 {
-                    map.SetTileOutLine(hit.point, colors[current_player_id], false);
-                    map.SetTileColor(hit.point, colors[current_player_id]);
+                    map.SetTilesColor(hit.point, colors[current_player_id]);
+                    map.SetTilesOutLine(hit.point, colors[current_player_id], false);
+
                     current_player_id++;
                     if (current_player_id == players.Length)
                         current_player_id = 0;
