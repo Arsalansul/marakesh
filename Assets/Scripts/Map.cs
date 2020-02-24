@@ -34,8 +34,8 @@ namespace Assets.Scripts
         {
             if (worldPos.x > Tile.size * size)
                 worldPos.x = Tile.size * (size - 0.5f);
-            if (worldPos.z > Tile.size * size)
-                worldPos.z = Tile.size * size;
+            if (worldPos.z > Tile.size * (size - 0.5f))
+                worldPos.z = Tile.size * (size - 0.5f);
             if (worldPos.x < 0)
                 worldPos.x = 0;
             if (worldPos.z < 0)
@@ -51,10 +51,10 @@ namespace Assets.Scripts
             return new Vector3(Tile.size * (tileIndex % size + 0.5f), 0, Tile.size * (tileIndex / size + 0.5f));
         }
 
-        public void SetTilesOutLine(Vector3 worldPos, Color color, bool activate)
+        public void SetTilesOutLine(Vector3 worldPos, Color color, SelectionOrientaion orientaion, bool activate)
         {
             outlinedTiles.Clear();
-            foreach (var selectedTile in GetSelectedTiles(worldPos, SelectionOrientaion.Horizontal))
+            foreach (var selectedTile in GetSelectedTiles(worldPos, orientaion))
             {
                 outlinedTiles.Add(selectedTile);
             }
@@ -70,8 +70,8 @@ namespace Assets.Scripts
                     yield return GetTileByPosition(worldPos - Vector3.right * Tile.size/2);
                     break;
                 case SelectionOrientaion.Vertival:
-                    yield return GetTileByPosition(worldPos + Vector3.up * Tile.size/2);
-                    yield return GetTileByPosition(worldPos - Vector3.down * Tile.size/2);
+                    yield return GetTileByPosition(worldPos + Vector3.forward * Tile.size/2);
+                    yield return GetTileByPosition(worldPos - Vector3.forward * Tile.size/2);
                     break;
                 default:
                     Debug.Assert(false);

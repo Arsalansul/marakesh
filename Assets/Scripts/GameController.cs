@@ -12,24 +12,35 @@ namespace Assets.Scripts
 
         private Camera mainCamera;
 
+        private SelectionOrientaion selectionOrientaion;
+
         void Start()
         {
             mainCamera = Camera.main;
             map = new Map();
+
+            selectionOrientaion = SelectionOrientaion.Horizontal;
         }
 
         void Update()
         {
+            if (Input.GetMouseButtonUp(1))
+            {
+                selectionOrientaion++;
+                if ((int) selectionOrientaion == System.Enum.GetValues(typeof(SelectionOrientaion)).Length)
+                    selectionOrientaion = 0;
+            }
+
             var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out var hit))
             {
-                map.SetTilesOutLine(hit.point, colors[current_player_id], true);
+                map.SetTilesOutLine(hit.point, colors[current_player_id], selectionOrientaion, true);
 
 
                 if (Input.GetMouseButtonUp(0))
                 {
                     map.SetTilesColor(hit.point, colors[current_player_id]);
-                    map.SetTilesOutLine(hit.point, colors[current_player_id], false);
+                    map.SetTilesOutLine(hit.point, colors[current_player_id], selectionOrientaion, false);
 
                     current_player_id++;
                     if (current_player_id == players.Length)
