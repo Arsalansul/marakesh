@@ -8,7 +8,7 @@ namespace Assets.Scripts
         public int size = 7;
         public Tile[] tiles;
 
-        private OutlinedTiles outlinedTiles;
+        public OutlinedTiles outlinedTiles;
 
         public Map()
         {

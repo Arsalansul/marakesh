@@ -1,17 +1,22 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
     class GameController : MonoBehaviour
     {
-        public Color[] colors = new Color[4];
-        public Player[] players = new Player[4];
+        private const int playersCount = 4;
+        public Color[] colors = new Color[playersCount];
+        public Player[] players = new Player[playersCount];
 
         public GameObject marakeshModel;
         private MarakeshModelController marakeshModelController;
 
         private Map map;
+
         private int current_player_id = 0;
+        private int my_player_id;
 
         private Camera mainCamera;
 
@@ -20,8 +25,14 @@ namespace Assets.Scripts
 
         private SelectionOrientation selectionOrientation;
         private int orientationLength;
+
+        private IMarakeshServer marakeshServer;
         void Start()
         {
+            marakeshServer = new FakeMarakeshServer(playersCount);
+            my_player_id = marakeshServer.GetMyPlayerID();
+            marakeshServer.activePlayerChanged += delegate { current_player_id = marakeshServer.GetActivePlayerId(); };
+
             mainCamera = Camera.main;
             map = new Map();
 
@@ -34,11 +45,14 @@ namespace Assets.Scripts
             currentState = GameState.Move;
             gameStateLength = System.Enum.GetValues(typeof(GameState)).Length;
 
-            marakeshModelController.move_finished += NextGameState;
+            marakeshModelController.move_finished += GoToNextGameState;
         }
 
         void Update()
         {
+            if (my_player_id != current_player_id)
+                return;
+
             switch (currentState)
             {
                 case GameState.Move:
@@ -66,12 +80,15 @@ namespace Assets.Scripts
 
 
                 if (Input.GetMouseButtonUp(0))
-                {
+                { 
+                    marakeshServer.SetLastCarpetPosition(map.outlinedTiles.Select(t => Array.IndexOf(map.tiles,t)).ToList());
                     map.SetTilesColor(hit.point, colors[current_player_id]);
                     map.SetTilesOutLine(hit.point, colors[current_player_id], selectionOrientation, false);
 
-                    NextPlayer();
-                    NextGameState();
+                    GoToNextGameState();
+
+                    
+                    marakeshServer.EndTurn();
                 }
             }
         }
@@ -85,23 +102,20 @@ namespace Assets.Scripts
 
             if (Input.GetMouseButtonUp(0))
             {
-                marakeshModelController.Move(map.GetNextTile(marakeshModelController.currentTile, ref marakeshModelController.lookingSide));
+                var nextPos = map.GetNextTile(marakeshModelController.currentTile,
+                    ref marakeshModelController.lookingSide);
+                marakeshModelController.Move(nextPos);
                 marakeshModelController.CheckLookingSide();
+
+                marakeshServer.SetMarkeshPosition(Array.IndexOf(map.tiles, nextPos), marakeshModelController.lookingSide);
             }
         }
 
-        private void NextGameState()
+        private void GoToNextGameState()
         {
             currentState++;
             if ((int)currentState == gameStateLength)
                 currentState = 0;
-        }
-
-        private void NextPlayer()
-        {
-            current_player_id++;
-            if (current_player_id == players.Length)
-                current_player_id = 0;
         }
     }
 }
