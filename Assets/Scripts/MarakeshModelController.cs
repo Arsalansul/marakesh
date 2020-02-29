@@ -14,18 +14,21 @@ namespace Assets.Scripts
         public Action move_finished;
         public Tile currentTile;
         public LookingSide lookingSide;
+
+        private Quaternion startRot;
         public MarakeshModelController(GameObject marakeshGameObject, Tile tile)
         {
             this.marakeshGameObject = Object.Instantiate(marakeshGameObject);
             this.marakeshGameObject.transform.position = tile.posV3;
             currentTile = tile;
             lookingSide = LookingSide.up;
+            startRot = marakeshGameObject.transform.rotation;
         }
 
         public void Rotate()
         {
-            marakeshGameObject.transform.rotation = Quaternion.Euler(0, 90, 0) * marakeshGameObject.transform.rotation;
             lookingSide = LookSide.NextLookingSide(lookingSide);
+            CheckLookingSide();
         }
 
         public void Move(Tile tile)
@@ -33,6 +36,11 @@ namespace Assets.Scripts
             marakeshGameObject.transform.position = tile.posV3;
             move_finished();
             currentTile = tile;
+        }
+
+        public void CheckLookingSide()
+        {
+            marakeshGameObject.transform.rotation = Quaternion.Euler(0, 90 * (int)lookingSide, 0) * startRot;
         }
     }
 }

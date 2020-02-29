@@ -85,7 +85,8 @@ namespace Assets.Scripts
 
             if (Input.GetMouseButtonUp(0))
             {
-                marakeshModelController.Move(map.GetNextTile(marakeshModelController.currentTile, marakeshModelController.lookingSide));
+                marakeshModelController.Move(map.GetNextTile(marakeshModelController.currentTile, ref marakeshModelController.lookingSide));
+                marakeshModelController.CheckLookingSide();
             }
         }
 

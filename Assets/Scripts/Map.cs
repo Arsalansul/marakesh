@@ -97,33 +97,34 @@ namespace Assets.Scripts
             }
         }
 
-        /// <summary>
-        /// d6 dice; 5 = 3; 6 = 2
-        /// </summary>
-        /// <returns></returns>
-        public Tile GetNextTile(Tile currentTile, LookingSide lookingSide)
+        public Tile GetNextTile(Tile currentTile, ref LookingSide lookingSide)
         {
-            var d6 = Random.Range(1, 7);
-            return GetNextTile(currentTile, d6, lookingSide);
-        }
-
-        private Tile GetNextTile(Tile currentTile, int d6, LookingSide lookingSide)
-        {
-            Debug.Log( new Vector2Int(d6, 0));
-            switch (d6)
+            var tilePosV2 = currentTile.position + GetDirection(lookingSide);
+            if (tilePosV2.x >= size)
             {
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                    return GetTile(currentTile.position + GetDirection(lookingSide) * d6);
-                case 5:
-                    return GetNextTile(currentTile, 3, lookingSide);
-                case 6:
-                    return GetNextTile(currentTile, 2, lookingSide);
-                default:
-                    return currentTile;
+                lookingSide = LookSide.NextLookingSide(lookingSide);
+                tilePosV2 = currentTile.position + GetDirection(lookingSide);
+                lookingSide = LookSide.NextLookingSide(lookingSide);
             }
+            if (tilePosV2.x < 0)
+            {
+                lookingSide = LookSide.NextLookingSide(lookingSide);
+                tilePosV2 = currentTile.position + GetDirection(lookingSide);
+                lookingSide = LookSide.NextLookingSide(lookingSide);
+            }
+            if (tilePosV2.y >= size)
+            {
+                lookingSide = LookSide.NextLookingSide(lookingSide);
+                tilePosV2 = currentTile.position + GetDirection(lookingSide);
+                lookingSide = LookSide.NextLookingSide(lookingSide);
+            }
+            if (tilePosV2.y < 0)
+            {
+                lookingSide = LookSide.NextLookingSide(lookingSide);
+                tilePosV2 = currentTile.position + GetDirection(lookingSide);
+                lookingSide = LookSide.NextLookingSide(lookingSide);
+            }
+            return GetTile(tilePosV2);
         }
 
         private Vector2Int GetDirection(LookingSide lookingSide)
