@@ -1,6 +1,6 @@
 ﻿namespace Assets.Scripts
 {
-    public enum SelectionOrientaion
+    public enum SelectionOrientation
     {
         Horizontal,
         Vertival
