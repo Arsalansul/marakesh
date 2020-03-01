@@ -79,15 +79,12 @@ namespace Assets.Scripts
                 map.SetTilesOutLine(hit.point, colors[current_player_id], selectionOrientation, true);
 
 
-                if (Input.GetMouseButtonUp(0))
+                if (Input.GetMouseButtonUp(0) && map.outlinedTiles.Count >=2)
                 { 
                     marakeshServer.SetLastCarpetPosition(map.outlinedTiles.Select(t => Array.IndexOf(map.tiles,t)).ToList());
                     map.SetTilesColor(hit.point, colors[current_player_id]);
                     map.SetTilesOutLine(hit.point, colors[current_player_id], selectionOrientation, false);
-
                     GoToNextGameState();
-
-                    
                     marakeshServer.EndTurn();
                 }
             }
@@ -102,12 +99,12 @@ namespace Assets.Scripts
 
             if (Input.GetMouseButtonUp(0))
             {
-                var nextPos = map.GetNextTile(marakeshModelController.currentTile,
-                    ref marakeshModelController.lookingSide);
+                var nextPos = map.GetNextTile(marakeshModelController.currentTile, ref marakeshModelController.lookingSide);
                 marakeshModelController.Move(nextPos);
                 marakeshModelController.CheckLookingSide();
 
                 marakeshServer.SetMarkeshPosition(Array.IndexOf(map.tiles, nextPos), marakeshModelController.lookingSide);
+                map.GetNeighbourTiles(nextPos);
             }
         }
 

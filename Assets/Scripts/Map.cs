@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -10,6 +11,7 @@ namespace Assets.Scripts
 
         public OutlinedTiles outlinedTiles;
 
+        private HashSet<Tile> neighbourTiles;
         public Map()
         {
             tiles = new Tile[size * size];
@@ -19,6 +21,7 @@ namespace Assets.Scripts
             }
 
             outlinedTiles = new OutlinedTiles();
+            neighbourTiles = new HashSet<Tile>();
             Camera.main.transform.position = new Vector3(size / 2f * Tile.size, 7, size / 2f * Tile.size);
         }
 
@@ -36,20 +39,11 @@ namespace Assets.Scripts
             }
         }
 
-        private Tile GetTileByPosition(Vector3 worldPos)
+        public Tile GetTileByPosition(Vector3 worldPos)
         {
-            if (worldPos.x > Tile.size * size)
-                worldPos.x = Tile.size * (size - 0.5f);
-            if (worldPos.z > Tile.size * (size - 0.5f))
-                worldPos.z = Tile.size * (size - 0.5f);
-            if (worldPos.x < 0)
-                worldPos.x = 0;
-            if (worldPos.z < 0)
-                worldPos.z = 0;
-
             var x = (int)worldPos.x / Tile.size;
-            var z = (int)worldPos.z / Tile.size;
-            return tiles[z * size + x];
+            var y = (int)worldPos.z / Tile.size;
+            return GetTile(new Vector2Int(x,y));
         }
 
         private Vector3 GetTilePos(int tileIndex)
@@ -64,6 +58,14 @@ namespace Assets.Scripts
 
         public Tile GetTile(Vector2Int posV2)
         {
+            if (posV2.x >= size)
+                posV2.x = size - 1;
+            if (posV2.y >= size)
+                posV2.y = size - 1;
+            if (posV2.x < 0)
+                posV2.x = 0;
+            if (posV2.y < 0)
+                posV2.y = 0;
             return tiles[posV2.x + posV2.y * size];
         }
         public void SetTilesOutLine(Vector3 worldPos, Color color, SelectionOrientation orientation, bool activate)
@@ -71,28 +73,31 @@ namespace Assets.Scripts
             outlinedTiles.Clear();
             if (!activate)
                 return;
-
-            foreach (var selectedTile in GetSelectedTiles(worldPos, orientation))
-            {
-                outlinedTiles.Add(selectedTile);
-            }
-           
+            GetSelectedTiles(worldPos, orientation);
         }
 
-        public IEnumerable<Tile> GetSelectedTiles(Vector3 worldPos, SelectionOrientation orientation)
+        public void GetSelectedTiles(Vector3 worldPos, SelectionOrientation orientation)
         {
+            Tile tile_0, tile_1;
             switch (orientation)
             {
                 case SelectionOrientation.Horizontal:
-                    yield return GetTileByPosition(worldPos + Vector3.right * Tile.size/2);
-                    yield return GetTileByPosition(worldPos - Vector3.right * Tile.size/2);
+                    tile_0 = GetTileByPosition(worldPos + Vector3.right * Tile.size / 2);
+                    tile_1 = GetTileByPosition(worldPos - Vector3.right * Tile.size / 2);
+                    if (neighbourTiles.Contains(tile_0) || neighbourTiles.Contains(tile_1))
+                    {
+                        outlinedTiles.Add(tile_0);
+                        outlinedTiles.Add(tile_1);
+                    }
                     break;
                 case SelectionOrientation.Vertival:
-                    yield return GetTileByPosition(worldPos + Vector3.forward * Tile.size/2);
-                    yield return GetTileByPosition(worldPos - Vector3.forward * Tile.size/2);
-                    break;
-                default:
-                    Debug.Assert(false);
+                    tile_0 = GetTileByPosition(worldPos + Vector3.forward * Tile.size / 2);
+                    tile_1 = GetTileByPosition(worldPos - Vector3.forward * Tile.size / 2);
+                    if (neighbourTiles.Contains(tile_0) || neighbourTiles.Contains(tile_1))
+                    {
+                        outlinedTiles.Add(tile_0);
+                        outlinedTiles.Add(tile_1);
+                    }
                     break;
             }
         }
@@ -141,6 +146,17 @@ namespace Assets.Scripts
                     return new Vector2Int(-1, 0);
                 default:
                     return new Vector2Int(0, 1);
+            }
+        }
+
+        public void GetNeighbourTiles(Tile tile)
+        {
+            neighbourTiles.Clear();
+            var lookSide = LookingSide.up;
+            for (int i = 0; i < 4; i++)
+            {
+                neighbourTiles.Add(GetTile(tile.position + GetDirection(lookSide)));
+                lookSide = LookSide.NextLookingSide(lookSide);
             }
         }
     }

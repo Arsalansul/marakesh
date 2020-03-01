@@ -2,7 +2,7 @@
 
 namespace Assets.Scripts
 {
-    public class OutlinedTiles : List<Tile>
+    public class OutlinedTiles : HashSet<Tile>
     {
         public new void Add(Tile item)
         {
