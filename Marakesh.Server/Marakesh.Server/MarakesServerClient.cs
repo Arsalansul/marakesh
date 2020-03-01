@@ -48,7 +48,7 @@ namespace Marakesh.Server
                     var firstRequestData = Encoding.UTF8.GetBytes(firstRequestJson);
                     await stream.WriteAsync(firstRequestData, 0, firstRequestData.Length, token);
 
-                    var payerCountRequest = new FirstRequest()
+                    var payerCountRequest = new PlayerCountRequest()
                     {
                         RequestType = RequestType.PlayerCount,
                     };
