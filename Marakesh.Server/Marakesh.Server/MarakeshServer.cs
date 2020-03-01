@@ -69,6 +69,16 @@ namespace Marakesh.Server
                             switch (firstRequest.RequestType)
                             {
                                 case RequestType.PlayerCount:
+
+                                    var playerCountRequestSize = PlayerCountRequest.GetSize();
+                                    buffer = new byte[playerCountRequestSize];
+
+                                    stream.Read(buffer, 0, buffer.Length);
+                                    result = System.Text.Encoding.UTF8.GetString(buffer);
+                                    var playerCountRequest = JsonConvert.DeserializeObject<PlayerCountRequest>(result);
+
+
+
                                     response.PlayerCount = 4;
                                     break;
                                 default:
