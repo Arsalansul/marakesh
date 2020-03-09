@@ -4,4 +4,8 @@
     <TargetFramework>net471</TargetFramework>
   </PropertyGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;D:\Projects\Marakesh-Ars\Assets\Scripts&quot;" />
+  </Target>
+
 </Project>
