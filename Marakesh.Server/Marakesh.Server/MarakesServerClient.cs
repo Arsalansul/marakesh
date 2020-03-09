@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace Marakesh.Server
 {
-    public class MarakeshServerClient : IMarakeshServer
+    public class MarakeshServerClient : IMarakeshClient
     {
         private const int maxTries = 5;
         private const int _timeBetweenTries = 100;
@@ -44,15 +44,16 @@ namespace Marakesh.Server
                     {
                         RequestType = RequestType.PlayerCount,
                     };
-                    var firstRequestJson = JsonUtility.ToJson(firstRequest);
+                    var firstRequestJson = JsonConvert.SerializeObject(firstRequest);
+                    Debug.Log($"firstRequestJson sent  '{firstRequestJson}'");
                     var firstRequestData = Encoding.UTF8.GetBytes(firstRequestJson);
-                    await stream.WriteAsync(firstRequestData, 0, firstRequestData.Length, token);
+                    stream.Write(firstRequestData, 0, firstRequestData.Length);
 
                     var payerCountRequest = new PlayerCountRequest()
                     {
                         RequestType = RequestType.PlayerCount,
                     };
-                    var payerCountRequestJson = JsonUtility.ToJson(payerCountRequest);
+                    var payerCountRequestJson = JsonConvert.SerializeObject(payerCountRequest);
                     var payerCountRequestData = Encoding.UTF8.GetBytes(payerCountRequestJson);
                     await stream.WriteAsync(payerCountRequestData, 0, payerCountRequestData.Length, token);
 

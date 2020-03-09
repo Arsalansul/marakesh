@@ -59,9 +59,10 @@ namespace Marakesh.Server
                         {
                             var firstRequestSize = FirstRequest.GetSize();
                             var buffer = new byte[firstRequestSize];
-
+                            Debug.Log($"firstRequestSize {firstRequestSize}");
                             stream.Read(buffer, 0, buffer.Length);
                             string result = System.Text.Encoding.UTF8.GetString(buffer);
+                            Debug.Log($"firstRequest string '{result}'");
                             var firstRequest = JsonConvert.DeserializeObject<FirstRequest>(result);
 
                             var response = new Response();
@@ -87,7 +88,7 @@ namespace Marakesh.Server
                                     break;
                             }
 
-                            var responseJson = JsonUtility.ToJson(response);
+                            var responseJson = JsonConvert.SerializeObject(response);
                             var responseData = Encoding.UTF8.GetBytes(responseJson);
                             Debug.Log($"Отправлено сообщение: {responseData}");
                             stream.Write(responseData, 0, responseData.Length);

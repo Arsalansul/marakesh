@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Assets.Scripts;
 
-namespace Assets.Scripts
+namespace Marakesh.Common
 {
-    public interface IMarakeshServer
+    public interface IMarakeshClient
     {
         Task<int> GetPlayerCount(CancellationToken token);
         int GetActivePlayerId();
