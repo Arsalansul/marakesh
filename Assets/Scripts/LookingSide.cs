@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 namespace Assets.Scripts
 {
-    public enum LookingSide
+    /*public enum LookingSide
     {
         up,
         right,
@@ -25,5 +25,5 @@ namespace Assets.Scripts
                 lookingSide = 0;
             return lookingSide;
         }
-    }
+    }*/
 }

@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
+using Marakesh.Common;
+using Marakesh.Server;
 
 namespace Assets.Scripts
 {
@@ -26,12 +30,34 @@ namespace Assets.Scripts
         private SelectionOrientation selectionOrientation;
         private int orientationLength;
 
-        private IMarakeshServer marakeshServer;
+        private Marakesh.Common.IMarakeshClient marakeshClient;
+
+        private Marakesh.Server.MarakeshServer marakeshServer;
+
         void Start()
         {
-            marakeshServer = new FakeMarakeshServer(playersCount);
-            my_player_id = marakeshServer.GetMyPlayerID();
-            marakeshServer.activePlayerChanged += delegate { current_player_id = marakeshServer.GetActivePlayerId(); };
+
+            var serverCancellationTokenSource = new CancellationTokenSource(6000);
+            marakeshServer = new MarakeshServer();
+
+            //TODO: moe this to UI button
+            Task.Run(() =>
+            {
+                marakeshServer.StartServer(serverCancellationTokenSource.Token);
+                Debug.Log($" marakeshServer.StartServer ");
+            });
+
+            marakeshClient = new MarakeshServerClient(marakeshServer.IpAddress);
+            var clientCancellationTokenSource = new CancellationTokenSource(3000);
+            
+            //TODO: moe this to UI button
+            Task.Run(async () =>
+            {
+                var playerCount = await marakeshClient.GetPlayerCount(clientCancellationTokenSource.Token);
+                Debug.Log($" playerCount {playerCount}");
+            });
+            //TODO: catch exceptions
+
 
             mainCamera = Camera.main;
             map = new Map();
